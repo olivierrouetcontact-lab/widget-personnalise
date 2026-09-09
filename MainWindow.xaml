@@ -18,9 +18,9 @@
         Closing="Window_Closing"
         SizeChanged="Window_SizeChanged">
     <Border Margin="6"
-            Background="#30000000"
+            Background="#D9F3F5F7"
             CornerRadius="16"
-            BorderBrush="#58FFFFFF"
+            BorderBrush="#A8FFFFFF"
             BorderThickness="1">
         <Border.Effect>
             <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.16" Color="#14213D" />
@@ -58,8 +58,8 @@
 
             <Grid Grid.Row="1" Margin="8,5,8,7">
                 <Border x:Name="MailCard" Padding="8,7"
-                        Background="#3DFFFFFF" CornerRadius="14"
-                        BorderBrush="#35FFFFFF" BorderThickness="1">
+                        Background="#DCEFF2F5" CornerRadius="14"
+                        BorderBrush="#8FFFFFFF" BorderThickness="1">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />

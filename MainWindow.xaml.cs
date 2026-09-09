@@ -753,11 +753,11 @@ public partial class MainWindow : Window
             var card = new Border
             {
                 Background = new SolidColorBrush(isNew
-                    ? System.Windows.Media.Color.FromArgb(68, 197, 107, 22)
-                    : System.Windows.Media.Color.FromArgb(28, 255, 255, 255)),
+                    ? System.Windows.Media.Color.FromArgb(218, 255, 226, 190)
+                    : System.Windows.Media.Color.FromArgb(210, 255, 255, 255)),
                 BorderBrush = new SolidColorBrush(isNew
-                    ? System.Windows.Media.Color.FromArgb(100, 197, 107, 22)
-                    : System.Windows.Media.Color.FromArgb(42, 255, 255, 255)),
+                    ? System.Windows.Media.Color.FromArgb(180, 197, 107, 22)
+                    : System.Windows.Media.Color.FromArgb(125, 148, 163, 184)),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(8, 5, 7, 5),
@@ -777,7 +777,7 @@ public partial class MainWindow : Window
                 Text = message.Sender,
                 FontSize = 11,
                 FontWeight = message.IsUnread ? FontWeights.Bold : FontWeights.SemiBold,
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(226, 232, 240)),
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(31, 41, 55)),
                 TextTrimming = TextTrimming.CharacterEllipsis
             };
             layout.Children.Add(sender);
@@ -786,7 +786,7 @@ public partial class MainWindow : Window
             {
                 Text = FormatMailTime(message.ReceivedAt),
                 FontSize = 9,
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(185, 198, 216)),
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(107, 114, 128)),
                 Margin = new Thickness(8, 1, 0, 0),
                 VerticalAlignment = VerticalAlignment.Top
             };
@@ -798,7 +798,7 @@ public partial class MainWindow : Window
                 Text = message.Subject,
                 FontSize = 10,
                 FontWeight = message.IsUnread ? FontWeights.SemiBold : FontWeights.Normal,
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(203, 213, 225)),
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(55, 65, 81)),
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 Margin = new Thickness(0, 2, 0, 0)
             };
