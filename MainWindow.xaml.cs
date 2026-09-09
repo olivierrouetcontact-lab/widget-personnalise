@@ -425,6 +425,7 @@ public partial class MainWindow : Window
             StatusText.Text = "C'est noté : le compteur repart de zéro.";
             await _settingsStore.SaveAsync(_settings, _lifetime.Token);
             LastCheckedText.Text = FormatLastChecked(_settings.LastCheckedUtc);
+            await RenderRecentMailsAsync();
         }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
         {
