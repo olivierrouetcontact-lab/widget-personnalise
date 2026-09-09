@@ -32,6 +32,48 @@ jobs:
           -p:PublishSingleFile=true
           -p:Version=1.0.${{ github.run_number }}
 
+      - name: Signer l'exécutable Windows si le certificat est configuré
+        shell: pwsh
+        env:
+          WINDOWS_SIGNING_CERT_BASE64: ${{ secrets.WINDOWS_SIGNING_CERT_BASE64 }}
+          WINDOWS_SIGNING_CERT_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERT_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:WINDOWS_SIGNING_CERT_BASE64) -or
+              [string]::IsNullOrWhiteSpace($env:WINDOWS_SIGNING_CERT_PASSWORD)) {
+            Write-Host "Aucun certificat de signature configuré : publication non signée."
+            exit 0
+          }
+
+          $publishDirectory = Join-Path $env:GITHUB_WORKSPACE "bin\\Release\\net8.0-windows\\win-x64\\publish"
+          $executablePath = Join-Path $publishDirectory "MailWidget.exe"
+          $certificatePath = Join-Path $env:RUNNER_TEMP "widget-signing.pfx"
+          $certificateBytes = [Convert]::FromBase64String($env:WINDOWS_SIGNING_CERT_BASE64)
+          [System.IO.File]::WriteAllBytes($certificatePath, $certificateBytes)
+
+          try {
+            $signTool = Get-ChildItem -Path "${env:ProgramFiles(x86)}\\Windows Kits\\10\\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match "\\\\x64\\\\signtool\\.exe$" } |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1
+
+            if (-not $signTool) {
+              throw "signtool.exe est introuvable sur le runner Windows."
+            }
+
+            & $signTool.FullName sign /fd SHA256 /f $certificatePath /p $env:WINDOWS_SIGNING_CERT_PASSWORD /tr "https://timestamp.digicert.com" /td SHA256 $executablePath
+            if ($LASTEXITCODE -ne 0) {
+              throw "La signature Authenticode de MailWidget.exe a échoué."
+            }
+
+            & $signTool.FullName verify /pa /all $executablePath
+            if ($LASTEXITCODE -ne 0) {
+              throw "La vérification de la signature de MailWidget.exe a échoué."
+            }
+          }
+          finally {
+            Remove-Item -Path $certificatePath -Force -ErrorAction SilentlyContinue
+          }
+
       - name: Préparer le paquet et le manifeste
         id: package
         shell: pwsh
