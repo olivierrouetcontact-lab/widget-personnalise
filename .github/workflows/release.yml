@@ -1,0 +1,87 @@
+name: Construire et publier le widget
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer le SDK .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publier le fichier Windows autonome
+        shell: pwsh
+        run: >-
+          dotnet publish MailWidget.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:Version=1.0.${{ github.run_number }}
+
+      - name: Préparer le paquet et le manifeste
+        id: package
+        shell: pwsh
+        env:
+          RELEASE_VERSION: 1.0.${{ github.run_number }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+        run: |
+          $publishDirectory = Join-Path $env:GITHUB_WORKSPACE "bin\Release\net8.0-windows\win-x64\publish"
+          $stagingDirectory = Join-Path $env:RUNNER_TEMP "widget-personnalise-staging"
+          $packagePath = Join-Path $env:RUNNER_TEMP "WidgetPersonnalise-win-x64.zip"
+          $manifestPath = Join-Path $env:RUNNER_TEMP "latest.json"
+
+          if (-not (Test-Path (Join-Path $publishDirectory "MailWidget.exe"))) {
+            throw "MailWidget.exe est absent du dossier publié."
+          }
+
+          New-Item -ItemType Directory -Path $stagingDirectory -Force | Out-Null
+          Copy-Item -Path (Join-Path $publishDirectory "*") -Destination $stagingDirectory -Recurse -Force
+          Remove-Item -Path (Join-Path $stagingDirectory "credentials.json") -Force -ErrorAction SilentlyContinue
+          Compress-Archive -Path (Join-Path $stagingDirectory "*") -DestinationPath $packagePath -Force
+
+          $hash = (Get-FileHash -Path $packagePath -Algorithm SHA256).Hash.ToLowerInvariant()
+          $manifest = [ordered]@{
+            version = $env:RELEASE_VERSION
+            downloadUrl = "https://github.com/$env:RELEASE_REPOSITORY/releases/latest/download/WidgetPersonnalise-win-x64.zip"
+            sha256 = $hash
+            notes = "Mise à jour automatique du Widget personnalisé."
+          }
+          $manifest | ConvertTo-Json | Set-Content -Path $manifestPath -Encoding utf8
+
+          "package_path=$packagePath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "manifest_path=$manifestPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Mettre à jour la version publiée
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $packagePath = "${{ steps.package.outputs.package_path }}"
+          $manifestPath = "${{ steps.package.outputs.manifest_path }}"
+          $releaseExists = gh release view latest --repo "${{ github.repository }}" 2>$null
+
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload latest $packagePath $manifestPath --clobber --repo "${{ github.repository }}"
+          }
+          else {
+            gh release create latest $packagePath $manifestPath `
+              --repo "${{ github.repository }}" `
+              --title "Widget personnalisé — dernière version" `
+              --notes "Version publiée automatiquement depuis la branche main." `
+              --target "${{ github.sha }}" `
+              --latest
+          }
