@@ -1,0 +1,129 @@
+<Window x:Class="MailWidget.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gmail"
+        Width="300"
+        Height="190"
+        MinWidth="220"
+        MinHeight="150"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="False"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
+        SizeChanged="Window_SizeChanged">
+    <Border Margin="6"
+            Background="#30000000"
+            CornerRadius="16"
+            BorderBrush="#58FFFFFF"
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.16" Color="#14213D" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="12,7,8,0" Cursor="SizeAll"
+                  MouseLeftButtonDown="Header_MouseLeftButtonDown"
+                  MouseMove="Header_MouseMove"
+                  MouseLeftButtonUp="Header_MouseLeftButtonUp">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Boîte Gmail" FontSize="13" FontWeight="Bold"
+                           Foreground="{StaticResource PrimaryText}"
+                           VerticalAlignment="Center" />
+                <Button x:Name="UpdateButton" Grid.Column="1" Content="↻"
+                        Style="{StaticResource IconButton}"
+                        Width="24" Height="24" FontSize="17"
+                        Foreground="{StaticResource Accent}"
+                        Visibility="Collapsed"
+                        ToolTip="Installer la mise à jour disponible"
+                        Click="UpdateButton_Click" />
+                <Button Grid.Column="2" Content="×" Style="{StaticResource IconButton}"
+                        Width="24" Height="24" FontSize="17"
+                        Foreground="{StaticResource PrimaryText}" Click="HideButton_Click" />
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="8,5,8,7">
+                <Border x:Name="CountCard" Padding="10,7"
+                        Background="#3DFFFFFF" CornerRadius="14"
+                        BorderBrush="#35FFFFFF" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Nouveaux mails en attente"
+                                   FontSize="10" Foreground="{StaticResource SecondaryText}"
+                                   HorizontalAlignment="Center" />
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Margin="0,0,0,3">
+                            <TextBlock x:Name="CountText" Text="0" FontSize="42"
+                                       FontWeight="Bold" Foreground="{StaticResource Success}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock x:Name="CountLabel" Text="nouveaux mails"
+                                       Margin="7,0,0,3" VerticalAlignment="Bottom"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryText}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <Button x:Name="OpenGmailButton" Content="Vérifier mes mails"
+                                    Style="{StaticResource WidgetButton}"
+                                    Padding="10,7" FontSize="11"
+                                    Click="OpenGmailButton_Click" />
+                            <Button x:Name="MarkCheckedButton" Content="J'ai vérifié"
+                                    Margin="6,0,0,0" Style="{StaticResource QuietButton}"
+                                    Padding="8,7" FontSize="11"
+                                    Click="MarkCheckedButton_Click" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Hidden controls retained for settings, errors, and compatibility
+                 with the existing code and saved data. -->
+            <StackPanel Grid.Row="0" Grid.RowSpan="2" Visibility="Collapsed">
+                <StackPanel x:Name="NotesPanel" />
+                <Button x:Name="AddNoteButton" Click="AddNoteButton_Click" />
+                <TextBlock x:Name="StatusText" />
+                <TextBlock x:Name="LastCheckedText" />
+                <Button x:Name="RefreshButton" Click="RefreshButton_Click" />
+                <CheckBox x:Name="StartWithWindowsCheckBox"
+                          Checked="StartWithWindowsCheckBox_Changed"
+                          Unchecked="StartWithWindowsCheckBox_Changed" />
+            </StackPanel>
+
+            <Thumb Grid.Row="0" Grid.RowSpan="2" Panel.ZIndex="10" Width="18" Height="18"
+                   HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   Margin="0,0,5,5" Cursor="SizeNWSE" DragDelta="ResizeThumb_DragDelta">
+                <Thumb.Template>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border Background="Transparent">
+                            <Path Data="M 16,2 L 16,16 L 2,16"
+                                  Stroke="#AAB5C6" StrokeThickness="2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                        </Border>
+                    </ControlTemplate>
+                </Thumb.Template>
+            </Thumb>
+        </Grid>
+    </Border>
+</Window>
