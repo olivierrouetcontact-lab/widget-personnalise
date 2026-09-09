@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Gmail"
         Width="300"
-        Height="190"
+        Height="220"
         MinWidth="220"
-        MinHeight="150"
+        MinHeight="170"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -57,7 +57,7 @@
             </Grid>
 
             <Grid Grid.Row="1" Margin="8,5,8,7">
-                <Border x:Name="CountCard" Padding="10,7"
+                <Border x:Name="MailCard" Padding="8,7"
                         Background="#3DFFFFFF" CornerRadius="14"
                         BorderBrush="#35FFFFFF" BorderThickness="1">
                     <Grid>
@@ -67,21 +67,23 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Nouveaux mails en attente"
-                                   FontSize="10" Foreground="{StaticResource SecondaryText}"
-                                   HorizontalAlignment="Center" />
-
-                        <StackPanel Grid.Row="1" Orientation="Horizontal"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                                    Margin="0,0,0,3">
-                            <TextBlock x:Name="CountText" Text="0" FontSize="42"
-                                       FontWeight="Bold" Foreground="{StaticResource Success}"
+                        <Grid Grid.Row="0" Margin="2,0,2,5">
+                            <TextBlock Text="Derniers messages" FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryText}"
                                        VerticalAlignment="Center" />
-                            <TextBlock x:Name="CountLabel" Text="nouveaux mails"
-                                       Margin="7,0,0,3" VerticalAlignment="Bottom"
-                                       FontSize="11" FontWeight="SemiBold"
-                                       Foreground="{StaticResource PrimaryText}" />
-                        </StackPanel>
+                            <TextBlock x:Name="PendingSummaryText"
+                                       HorizontalAlignment="Right"
+                                       FontSize="10"
+                                       Foreground="{StaticResource SecondaryText}"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel x:Name="MailListPanel" />
+                        </ScrollViewer>
 
                         <StackPanel Grid.Row="2" Orientation="Horizontal"
                                     HorizontalAlignment="Center">

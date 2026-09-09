@@ -3,6 +3,8 @@
 Widget Windows 10/11 en WPF qui :
 
 - affiche le nombre de messages reçus depuis le dernier clic sur **J'ai vérifié** ;
+- affiche les derniers mails de la boîte avec expéditeur, objet et heure ;
+- ouvre directement un mail dans Gmail quand tu cliques sur sa ligne ;
 - vérifie Gmail automatiquement toutes les 60 secondes ;
 - affiche une notification Windows lorsque le nombre augmente ;
 - affiche le panneau Gmail sur toute la largeur du widget ;
@@ -10,7 +12,7 @@ Widget Windows 10/11 en WPF qui :
 - se comporte comme une fenêtre widget normale sans premier plan : les fenêtres ouvertes le recouvrent ;
 - se lance automatiquement au démarrage de Windows, sans demander les droits administrateur ;
 - mémorise sa position, sa taille et l'instant du dernier check ;
-- ne lit que les métadonnées nécessaires au comptage et n'enregistre pas le contenu des mails.
+- ne lit que les métadonnées nécessaires à l'affichage (expéditeur, objet, date) et n'enregistre pas le contenu des mails.
 
 ## Mises à jour automatiques
 

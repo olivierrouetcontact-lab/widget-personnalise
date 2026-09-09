@@ -18,7 +18,7 @@ namespace MailWidget;
 public partial class MainWindow : Window
 {
     private const int CompactLayoutVersion = 2;
-    private const int CurrentSettingsVersion = 3;
+    private const int CurrentSettingsVersion = 4;
 
     private readonly SettingsStore _settingsStore = new();
     private readonly GmailMailService _gmailService = new();
@@ -357,6 +357,7 @@ public partial class MainWindow : Window
                 await _settingsStore.SaveAsync(_settings, _lifetime.Token);
                 _lastNotifiedCount = 0;
                 RenderCount(0);
+                await RenderRecentMailsAsync();
                 StatusText.Text = "Surveillance active.";
                 _hasRenderedCount = true;
             }
@@ -367,6 +368,7 @@ public partial class MainWindow : Window
                     _lifetime.Token);
 
                 RenderCount(count);
+                await RenderRecentMailsAsync();
                 StatusText.Text = count switch
                 {
                     0 => "Aucun nouveau message depuis ton dernier check.",
@@ -658,6 +660,14 @@ public partial class MainWindow : Window
                     _settings.WindowWidth = Width;
                     _settings.WindowHeight = Height;
                 }
+                else if (_settings.WindowHeight.HasValue && _settings.WindowHeight.Value <= 190)
+                {
+                    // Give the mailbox list a little more room when migrating
+                    // from the old count-only compact layout. Custom sizes
+                    // larger than the old default remain untouched.
+                    _settings.WindowHeight = defaultHeight;
+                    Height = defaultHeight;
+                }
             }
         }
         finally
@@ -707,19 +717,115 @@ public partial class MainWindow : Window
 
     private void RenderCount(int count)
     {
-        CountText.Text = count.ToString(CultureInfo.InvariantCulture);
-        CountLabel.Text = count == 1 ? "nouveau mail" : "nouveaux mails";
+        PendingSummaryText.Text = count == 0
+            ? "0 nouveau"
+            : count == 1
+                ? "1 nouveau"
+                : $"{count.ToString(CultureInfo.InvariantCulture)} nouveaux";
+        PendingSummaryText.Foreground = new SolidColorBrush(
+            count == 0
+                ? System.Windows.Media.Color.FromRgb(22, 131, 91)
+                : System.Windows.Media.Color.FromRgb(197, 107, 22));
+    }
 
-        if (count == 0)
+    private async Task RenderRecentMailsAsync()
+    {
+        var messages = await _gmailService.GetRecentIncomingAsync(_lifetime.Token);
+        MailListPanel.Children.Clear();
+
+        if (messages.Count == 0)
         {
-            CountCard.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(58, 22, 131, 91));
-            CountText.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(22, 131, 91));
+            MailListPanel.Children.Add(new TextBlock
+            {
+                Text = "Aucun message dans la boîte de réception.",
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(107, 114, 128)),
+                FontSize = 11,
+                Margin = new Thickness(4, 12, 4, 12),
+                HorizontalAlignment = HorizontalAlignment.Center
+            });
+            return;
         }
-        else
+
+        foreach (var message in messages)
         {
-            CountCard.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(64, 197, 107, 22));
-            CountText.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(197, 107, 22));
+            var isNew = _settings.LastCheckedUtc.HasValue
+                        && message.ReceivedAt > _settings.LastCheckedUtc.Value;
+            var card = new Border
+            {
+                Background = new SolidColorBrush(isNew
+                    ? System.Windows.Media.Color.FromArgb(68, 197, 107, 22)
+                    : System.Windows.Media.Color.FromArgb(28, 255, 255, 255)),
+                BorderBrush = new SolidColorBrush(isNew
+                    ? System.Windows.Media.Color.FromArgb(100, 197, 107, 22)
+                    : System.Windows.Media.Color.FromArgb(42, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(8, 5, 7, 5),
+                Margin = new Thickness(0, 0, 0, 4),
+                Cursor = Cursors.Hand,
+                ToolTip = "Ouvrir ce message dans Gmail"
+            };
+
+            var layout = new Grid();
+            layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            layout.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            layout.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            layout.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            var sender = new TextBlock
+            {
+                Text = message.Sender,
+                FontSize = 11,
+                FontWeight = message.IsUnread ? FontWeights.Bold : FontWeights.SemiBold,
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(226, 232, 240)),
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            layout.Children.Add(sender);
+
+            var time = new TextBlock
+            {
+                Text = FormatMailTime(message.ReceivedAt),
+                FontSize = 9,
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(185, 198, 216)),
+                Margin = new Thickness(8, 1, 0, 0),
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            Grid.SetColumn(time, 1);
+            layout.Children.Add(time);
+
+            var subject = new TextBlock
+            {
+                Text = message.Subject,
+                FontSize = 10,
+                FontWeight = message.IsUnread ? FontWeights.SemiBold : FontWeights.Normal,
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(203, 213, 225)),
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                Margin = new Thickness(0, 2, 0, 0)
+            };
+            Grid.SetRow(subject, 1);
+            layout.Children.Add(subject);
+
+            card.Child = layout;
+            card.MouseLeftButtonUp += (_, _) => OpenMailMessage(message.Id);
+            MailListPanel.Children.Add(card);
         }
+    }
+
+    private void OpenMailMessage(string messageId)
+    {
+        Process.Start(new ProcessStartInfo(
+            $"https://mail.google.com/mail/u/0/#all/{Uri.EscapeDataString(messageId)}")
+        {
+            UseShellExecute = true
+        });
+    }
+
+    private static string FormatMailTime(DateTimeOffset timestamp)
+    {
+        var local = timestamp.ToLocalTime();
+        return local.Date == DateTime.Today
+            ? local.ToString("HH:mm", CultureInfo.CurrentCulture)
+            : local.ToString("dd/MM", CultureInfo.CurrentCulture);
     }
 
     private static string FormatLastChecked(DateTimeOffset? timestamp)
