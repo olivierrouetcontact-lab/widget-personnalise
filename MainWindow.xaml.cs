@@ -490,8 +490,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        _exitRequested = true;
-        Close();
+        ExitApplication();
     }
 
     private void HideButton_Click(object sender, RoutedEventArgs e)
