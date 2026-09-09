@@ -18,6 +18,7 @@ namespace MailWidget;
 public partial class MainWindow : Window
 {
     private const int CompactLayoutVersion = 2;
+    private const int CurrentSettingsVersion = 3;
 
     private readonly SettingsStore _settingsStore = new();
     private readonly GmailMailService _gmailService = new();
@@ -89,6 +90,19 @@ public partial class MainWindow : Window
         try
         {
             RestoreOrPlaceWindow();
+
+            if (_settings.StartWithWindows)
+            {
+                try
+                {
+                    StartupManager.SetEnabled(true);
+                }
+                catch (Exception ex)
+                {
+                    StatusText.Text = $"Démarrage automatique indisponible : {ex.Message}";
+                }
+            }
+
             if (_needsSettingsSave)
             {
                 _needsSettingsSave = false;
@@ -594,6 +608,7 @@ public partial class MainWindow : Window
         const double defaultWidth = 300;
         const double defaultHeight = 190;
         var needsCompactMigration = _settings.LayoutVersion < CompactLayoutVersion;
+        var needsSettingsMigration = _settings.LayoutVersion < CurrentSettingsVersion;
         _isRestoringWindow = true;
         try
         {
@@ -628,13 +643,21 @@ public partial class MainWindow : Window
                 Top = workArea.Top + upperIconGap;
             }
 
-            if (needsCompactMigration)
+            if (needsSettingsMigration)
             {
-                _settings.LayoutVersion = CompactLayoutVersion;
-                _settings.WindowLeft = Left;
-                _settings.WindowTop = Top;
-                _settings.WindowWidth = Width;
-                _settings.WindowHeight = Height;
+                // Version 3 enables the requested Windows startup behavior.
+                // Existing local settings remain untouched apart from this
+                // one-time preference migration.
+                _settings.StartWithWindows = true;
+                _settings.LayoutVersion = CurrentSettingsVersion;
+
+                if (needsCompactMigration)
+                {
+                    _settings.WindowLeft = Left;
+                    _settings.WindowTop = Top;
+                    _settings.WindowWidth = Width;
+                    _settings.WindowHeight = Height;
+                }
             }
         }
         finally
@@ -642,7 +665,7 @@ public partial class MainWindow : Window
             _isRestoringWindow = false;
         }
 
-        _needsSettingsSave = needsCompactMigration;
+        _needsSettingsSave = needsSettingsMigration;
     }
 
     private static bool IsWithinWorkArea(

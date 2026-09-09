@@ -12,7 +12,7 @@ public sealed class AppSettings
 {
     public DateTimeOffset? LastCheckedUtc { get; set; }
     public int PollingIntervalSeconds { get; set; } = 60;
-    public bool StartWithWindows { get; set; }
+    public bool StartWithWindows { get; set; } = true;
     public double? WindowLeft { get; set; }
     public double? WindowTop { get; set; }
     public double? WindowWidth { get; set; }

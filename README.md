@@ -8,6 +8,7 @@ Widget Windows 10/11 en WPF qui :
 - affiche le panneau Gmail sur toute la largeur du widget ;
 - se place par défaut sur l'écran principal, dans la colonne droite du bureau ;
 - se comporte comme une fenêtre widget normale sans premier plan : les fenêtres ouvertes le recouvrent ;
+- se lance automatiquement au démarrage de Windows, sans demander les droits administrateur ;
 - mémorise sa position, sa taille et l'instant du dernier check ;
 - ne lit que les métadonnées nécessaires au comptage et n'enregistre pas le contenu des mails.
 
