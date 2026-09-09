@@ -44,15 +44,16 @@ jobs:
             exit 0
           }
 
-          $publishDirectory = Join-Path $env:GITHUB_WORKSPACE "bin\\Release\\net8.0-windows\\win-x64\\publish"
+          $publishDirectory = Join-Path $env:GITHUB_WORKSPACE "bin\Release\net8.0-windows\win-x64\publish"
           $executablePath = Join-Path $publishDirectory "MailWidget.exe"
           $certificatePath = Join-Path $env:RUNNER_TEMP "widget-signing.pfx"
           $certificateBytes = [Convert]::FromBase64String($env:WINDOWS_SIGNING_CERT_BASE64)
           [System.IO.File]::WriteAllBytes($certificatePath, $certificateBytes)
 
           try {
-            $signTool = Get-ChildItem -Path "${env:ProgramFiles(x86)}\\Windows Kits\\10\\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue |
-              Where-Object { $_.FullName -match "\\\\x64\\\\signtool\\.exe$" } |
+            $kitsDirectory = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\bin"
+            $signTool = Get-ChildItem -Path $kitsDirectory -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue |
+              Where-Object { $_.Directory.Name -eq "x64" } |
               Sort-Object FullName -Descending |
               Select-Object -First 1
 
