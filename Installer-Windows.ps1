@@ -146,10 +146,19 @@ $shortcut.IconLocation = "$executablePath,0"
 $shortcut.Description = "Widget Gmail et pense-bete"
 $shortcut.Save()
 
+$managerShortcutPath = Join-Path $desktopDirectory "Gestion du widget.lnk"
+$managerShortcut = $shell.CreateShortcut($managerShortcutPath)
+$managerShortcut.TargetPath = $executablePath
+$managerShortcut.Arguments = "--manage"
+$managerShortcut.WorkingDirectory = $publishDirectory
+$managerShortcut.IconLocation = "$executablePath,0"
+$managerShortcut.Description = "Gérer le widget personnalisé"
+$managerShortcut.Save()
+
 if (-not (Test-Path $credentialsTarget)) {
     Write-Host "Le widget est installe, mais credentials.json manque encore pour Gmail." -ForegroundColor Yellow
     Write-Host "Ajoute ce fichier dans : $publishDirectory" -ForegroundColor Yellow
 }
 
-Write-Host "Raccourci cree sur le bureau : $shortcutPath" -ForegroundColor Green
+Write-Host "Raccourcis crees sur le bureau : $shortcutPath et $managerShortcutPath" -ForegroundColor Green
 Start-Process -FilePath $executablePath -WorkingDirectory $publishDirectory
