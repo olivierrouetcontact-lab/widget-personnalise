@@ -176,6 +176,11 @@ public partial class MainWindow : Window
         ShowWidget();
     }
 
+    internal void ShowManagerFromStartup()
+    {
+        Dispatcher.BeginInvoke(new Action(ShowManager));
+    }
+
     internal string CurrentVersionText => UpdateService.CurrentVersion.ToString(3);
 
     internal string InstallationDirectory => AppContext.BaseDirectory;
@@ -539,6 +544,11 @@ public partial class MainWindow : Window
     private void HideButton_Click(object sender, RoutedEventArgs e)
     {
         Hide();
+    }
+
+    private void ManageButton_Click(object sender, RoutedEventArgs e)
+    {
+        ShowManager();
     }
 
     private void Header_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
