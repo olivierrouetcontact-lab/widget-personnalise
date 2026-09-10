@@ -14,6 +14,21 @@ Widget Windows 10/11 en WPF qui :
 - mémorise sa position, sa taille et l'instant du dernier check ;
 - ne lit que les métadonnées nécessaires à l'affichage (expéditeur, objet, date) et n'enregistre pas le contenu des mails.
 
+## Installation et réparation en un clic
+
+Si l'ancienne version du widget n'affiche pas le bouton de gestion, télécharge puis lance [GestionWidget.exe](https://github.com/olivierrouetcontact-lab/widget-personnalise/releases/latest/download/GestionWidget.exe).
+
+Ce programme autonome :
+
+- télécharge la dernière version ;
+- conserve `credentials.json`, le jeton Gmail, les notes et les réglages locaux ;
+- installe le widget dans un emplacement stable ;
+- crée les raccourcis `Gmail sur le bureau` et `Gestion du widget` ;
+- réactive le démarrage automatique de Windows.
+
+Si le widget est ouvert, ferme-le d'abord par clic droit sur l'icône Gmail près de l'horloge, puis choisis `Quitter`. Relance ensuite `GestionWidget.exe`.
+
+Cette étape est nécessaire une seule fois pour remplacer une ancienne installation qui ne sait pas encore se mettre à jour.
 ## Mises à jour automatiques
 
 Le dépôt public **Widget personnalisé** publie automatiquement une version Windows
