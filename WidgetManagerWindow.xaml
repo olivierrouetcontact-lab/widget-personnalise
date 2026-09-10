@@ -1,0 +1,160 @@
+<Window x:Class="MailWidget.WidgetManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gestion du widget"
+        Width="430"
+        Height="520"
+        MinWidth="390"
+        MinHeight="460"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResizeWithGrip"
+        ShowInTaskbar="True"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
+    <Border Margin="8"
+            Background="#F3F7F9FB"
+            CornerRadius="18"
+            BorderBrush="#B8FFFFFF"
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.2" Color="#14213D" />
+        </Border.Effect>
+
+        <Grid Margin="18,14,18,14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0"
+                  Margin="2,0,0,12"
+                  Cursor="SizeAll"
+                  MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="Gestion du widget"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource PrimaryText}" />
+                    <TextBlock Text="Tout gérer depuis un seul endroit"
+                               Margin="0,3,0,0"
+                               FontSize="12"
+                               Foreground="{StaticResource SecondaryText}" />
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="×"
+                        Style="{StaticResource IconButton}"
+                        Width="30"
+                        Height="30"
+                        FontSize="19"
+                        Foreground="{StaticResource PrimaryText}"
+                        Click="CloseButton_Click" />
+            </Grid>
+
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <Border Padding="13"
+                            Background="#DCEFF2F5"
+                            CornerRadius="13"
+                            BorderBrush="#8FFFFFFF"
+                            BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="État actuel"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryText}" />
+                            <TextBlock x:Name="VersionText"
+                                       Margin="0,6,0,0"
+                                       FontSize="13"
+                                       Foreground="{StaticResource PrimaryText}" />
+                            <TextBlock x:Name="InstallPathText"
+                                       Margin="0,4,0,0"
+                                       FontSize="11"
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource SecondaryText}" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Actions rapides"
+                               Margin="3,17,0,7"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource PrimaryText}" />
+
+                    <Button x:Name="CheckUpdateButton"
+                            Content="Rechercher une mise à jour"
+                            Style="{StaticResource WidgetButton}"
+                            HorizontalContentAlignment="Center"
+                            Click="CheckUpdateButton_Click" />
+
+                    <Button x:Name="InstallUpdateButton"
+                            Content="Installer la mise à jour disponible"
+                            Margin="0,7,0,0"
+                            Style="{StaticResource QuietButton}"
+                            HorizontalContentAlignment="Center"
+                            Visibility="Collapsed"
+                            Click="InstallUpdateButton_Click" />
+
+                    <Button x:Name="RefreshMailButton"
+                            Content="Actualiser Gmail"
+                            Margin="0,7,0,0"
+                            Style="{StaticResource QuietButton}"
+                            HorizontalContentAlignment="Center"
+                            Click="RefreshMailButton_Click" />
+
+                    <Button Content="Afficher le widget"
+                            Margin="0,7,0,0"
+                            Style="{StaticResource QuietButton}"
+                            HorizontalContentAlignment="Center"
+                            Click="ShowWidgetButton_Click" />
+
+                    <Button Content="Réparer le démarrage automatique"
+                            Margin="0,7,0,0"
+                            Style="{StaticResource QuietButton}"
+                            HorizontalContentAlignment="Center"
+                            Click="RepairStartupButton_Click" />
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,12,0,0">
+                        <Button Content="Ouvrir le dossier du widget"
+                                Style="{StaticResource QuietButton}"
+                                Padding="10,7"
+                                FontSize="11"
+                                Click="OpenInstallFolderButton_Click" />
+                        <Button Content="Ouvrir les réglages locaux"
+                                Margin="7,0,0,0"
+                                Style="{StaticResource QuietButton}"
+                                Padding="10,7"
+                                FontSize="11"
+                                Click="OpenDataFolderButton_Click" />
+                    </StackPanel>
+
+                    <TextBlock x:Name="ManagerStatusText"
+                               Margin="3,14,3,0"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource SecondaryText}" />
+                </StackPanel>
+            </ScrollViewer>
+
+            <TextBlock Grid.Row="2"
+                       Margin="3,13,3,0"
+                       Text="Ton compte Gmail, tes notes et ta position restent sur ce PC."
+                       FontSize="11"
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource SecondaryText}" />
+        </Grid>
+    </Border>
+</Window>
