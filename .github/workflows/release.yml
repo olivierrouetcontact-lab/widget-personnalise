@@ -32,6 +32,15 @@ jobs:
           -p:PublishSingleFile=true
           -p:Version=1.0.${{ github.run_number }}
 
+      - name: Publier le gestionnaire Windows autonome
+        shell: pwsh
+        run: >-
+          dotnet publish WidgetSetup/WidgetSetup.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:Version=1.0.${{ github.run_number }}
       - name: Signer l'exécutable Windows si le certificat est configuré
         shell: pwsh
         env:
@@ -45,7 +54,11 @@ jobs:
           }
 
           $publishDirectory = Join-Path $env:GITHUB_WORKSPACE "bin\Release\net8.0-windows\win-x64\publish"
-          $executablePath = Join-Path $publishDirectory "MailWidget.exe"
+          $setupPublishDirectory = Join-Path $env:GITHUB_WORKSPACE "WidgetSetup\bin\Release\net8.0-windows\win-x64\publish"
+          $executablePaths = @(
+            (Join-Path $publishDirectory "MailWidget.exe")
+            (Join-Path $setupPublishDirectory "GestionWidget.exe")
+          )
           $certificatePath = Join-Path $env:RUNNER_TEMP "widget-signing.pfx"
           $certificateBytes = [Convert]::FromBase64String($env:WINDOWS_SIGNING_CERT_BASE64)
           [System.IO.File]::WriteAllBytes($certificatePath, $certificateBytes)
@@ -61,14 +74,16 @@ jobs:
               throw "signtool.exe est introuvable sur le runner Windows."
             }
 
-            & $signTool.FullName sign /fd SHA256 /f $certificatePath /p $env:WINDOWS_SIGNING_CERT_PASSWORD /tr "https://timestamp.digicert.com" /td SHA256 $executablePath
-            if ($LASTEXITCODE -ne 0) {
-              throw "La signature Authenticode de MailWidget.exe a échoué."
-            }
+            foreach ($executablePath in $executablePaths) {
+              & $signTool.FullName sign /fd SHA256 /f $certificatePath /p $env:WINDOWS_SIGNING_CERT_PASSWORD /tr "https://timestamp.digicert.com" /td SHA256 $executablePath
+              if ($LASTEXITCODE -ne 0) {
+                throw "La signature Authenticode d'un exécutable a échoué."
+              }
 
-            & $signTool.FullName verify /pa /all $executablePath
-            if ($LASTEXITCODE -ne 0) {
-              throw "La vérification de la signature de MailWidget.exe a échoué."
+              & $signTool.FullName verify /pa /all $executablePath
+              if ($LASTEXITCODE -ne 0) {
+                throw "La vérification de la signature d'un exécutable a échoué."
+              }
             }
           }
           finally {
@@ -83,12 +98,18 @@ jobs:
           RELEASE_REPOSITORY: ${{ github.repository }}
         run: |
           $publishDirectory = Join-Path $env:GITHUB_WORKSPACE "bin\Release\net8.0-windows\win-x64\publish"
+          $setupPublishDirectory = Join-Path $env:GITHUB_WORKSPACE "WidgetSetup\bin\Release\net8.0-windows\win-x64\publish"
+          $setupPath = Join-Path $setupPublishDirectory "GestionWidget.exe"
           $stagingDirectory = Join-Path $env:RUNNER_TEMP "widget-personnalise-staging"
           $packagePath = Join-Path $env:RUNNER_TEMP "WidgetPersonnalise-win-x64.zip"
           $manifestPath = Join-Path $env:RUNNER_TEMP "latest.json"
 
           if (-not (Test-Path (Join-Path $publishDirectory "MailWidget.exe"))) {
             throw "MailWidget.exe est absent du dossier publié."
+          }
+
+          if (-not (Test-Path $setupPath)) {
+            throw "GestionWidget.exe est absent du dossier publié."
           }
 
           New-Item -ItemType Directory -Path $stagingDirectory -Force | Out-Null
@@ -107,6 +128,7 @@ jobs:
 
           "package_path=$packagePath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "manifest_path=$manifestPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "setup_path=$setupPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Mettre à jour la version publiée
         shell: pwsh
@@ -115,13 +137,14 @@ jobs:
         run: |
           $packagePath = "${{ steps.package.outputs.package_path }}"
           $manifestPath = "${{ steps.package.outputs.manifest_path }}"
+          $setupPath = "${{ steps.package.outputs.setup_path }}"
           $releaseExists = gh release view latest --repo "${{ github.repository }}" 2>$null
 
           if ($LASTEXITCODE -eq 0) {
-            gh release upload latest $packagePath $manifestPath --clobber --repo "${{ github.repository }}"
+            gh release upload latest $packagePath $manifestPath $setupPath --clobber --repo "${{ github.repository }}"
           }
           else {
-            gh release create latest $packagePath $manifestPath `
+            gh release create latest $packagePath $manifestPath $setupPath `
               --repo "${{ github.repository }}" `
               --title "Widget personnalisé — dernière version" `
               --notes "Version publiée automatiquement depuis la branche main." `
