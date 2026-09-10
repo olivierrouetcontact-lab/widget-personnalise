@@ -27,6 +27,12 @@ La première installation doit donc être faite avec la version qui contient
 `Update-Windows.ps1`. Après cela, les mises à jour se font depuis le widget, sans
 relancer le SDK .NET ni refaire la configuration Gmail.
 
+Pour gérer facilement l'application, utilise le bouton `⚙` dans l'en-tête du widget,
+le menu `Gérer le widget` de l'icône près de l'horloge, ou le raccourci de bureau
+`Gestion du widget`. Le centre de contrôle permet de vérifier une mise à jour,
+actualiser Gmail, afficher le widget, réparer le démarrage automatique et ouvrir les
+dossiers utiles.
+
 Le dépôt et les paquets sont publics pour permettre le téléchargement sans jeton
 GitHub dans l'application. Le fichier `credentials.json` est exclu du dépôt et
 est toujours conservé uniquement sur le PC.
