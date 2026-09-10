@@ -84,6 +84,15 @@ try {
     $shortcut.Description = "Widget Gmail et pense-bête"
     $shortcut.Save()
 
+    $managerShortcutPath = Join-Path $desktopDirectory "Gestion du widget.lnk"
+    $managerShortcut = $shell.CreateShortcut($managerShortcutPath)
+    $managerShortcut.TargetPath = $newExecutable
+    $managerShortcut.Arguments = "--manage"
+    $managerShortcut.WorkingDirectory = $newDirectory
+    $managerShortcut.IconLocation = "$newExecutable,0"
+    $managerShortcut.Description = "Gérer le widget personnalisé"
+    $managerShortcut.Save()
+
     $runKeyPath = "Software\Microsoft\Windows\CurrentVersion\Run"
     $runKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($runKeyPath, $true)
     if ($runKey -and $null -ne $runKey.GetValue("MailWidget", $null)) {
