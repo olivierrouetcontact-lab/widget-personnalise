@@ -22,7 +22,7 @@ export const VIX_SAINT_QUENTIN = Object.freeze({
   // Date des dernieres donnees consolidees utilisees pour ce snapshot.
   asOf: "2026-09-09",
   // Derniere verification automatique du fichier.
-  lastCheckedAt: "2026-09-10T05:07:46+02:00",
+  lastCheckedAt: "2026-09-10T13:07:12+02:00",
 
   subindices: Object.freeze({
     france: 48.7,
@@ -43,10 +43,10 @@ export const VIX_SAINT_QUENTIN = Object.freeze({
     note: "Chaque composante est transformee en score de stress de 0 a 100, puis ponderee. Une hausse rapide de l'indice est plus informative qu'un niveau eleve mais stable.",
 
     components: Object.freeze([
-      Object.freeze({ key: "oatBundSpread", label: "Spread OAT-Bund", weight: 12, rawValue: 90.0, unit: "pb", stressScore: 50.0, scope: "FRANCE" }),
-      Object.freeze({ key: "oat10y", label: "OAT France 10 ans", weight: 8, rawValue: 4.295, unit: "%", stressScore: 69.9, scope: "FRANCE" }),
+      Object.freeze({ key: "oatBundSpread", label: "Spread OAT-Bund", weight: 12, rawValue: 88.9, unit: "pb", stressScore: 49.1, scope: "FRANCE" }),
+      Object.freeze({ key: "oat10y", label: "OAT France 10 ans", weight: 8, rawValue: 4.3069, unit: "%", stressScore: 70.2, scope: "FRANCE" }),
       Object.freeze({ key: "unemploymentFrance", label: "Chomage France", weight: 10, rawValue: 8.3, unit: "%", stressScore: 38.3, scope: "FRANCE" }),
-      Object.freeze({ key: "businessFailures", label: "Defaillances d'entreprises", weight: 10, rawValue: 19, unit: "% vs moyenne 2010-2019", stressScore: 38.0, scope: "FRANCE" }),
+      Object.freeze({ key: "businessFailures", label: "Defaillances d'entreprises", weight: 10, rawValue: 19.3, unit: "% vs moyenne 2010-2019", stressScore: 38.6, scope: "FRANCE" }),
       Object.freeze({ key: "consumerConfidence", label: "Confiance des menages", weight: 8, rawValue: 86, unit: "indice", stressScore: 63.3, scope: "FRANCE" }),
       Object.freeze({ key: "inflationEnergy", label: "Inflation et choc energetique", weight: 7, rawValue: 2.4, unit: "% inflation", stressScore: 39.1, scope: "FRANCE" }),
       Object.freeze({ key: "publicDeficit", label: "Deficit public", weight: 5, rawValue: 5.2, unit: "% PIB", stressScore: 44.0, scope: "FRANCE" }),
