@@ -117,7 +117,7 @@ public partial class WidgetManagerWindow : Window
         Process.Start(new ProcessStartInfo
         {
             FileName = "explorer.exe",
-            Arguments = $"\\"{path}\\"",
+            Arguments = string.Concat('"', path, '"'),
             UseShellExecute = true
         });
     }
