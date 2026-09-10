@@ -13,6 +13,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="WidgetSetup\\**" />
+    <EmbeddedResource Remove="WidgetSetup\\**" />
+    <None Remove="WidgetSetup\\**" />
+    <Page Remove="WidgetSetup\\**" />
+    <ApplicationDefinition Remove="WidgetSetup\\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Google.Apis.Auth" Version="1.71.0" />
     <PackageReference Include="Google.Apis.Gmail.v1" Version="1.70.0.3819" />
   </ItemGroup>
