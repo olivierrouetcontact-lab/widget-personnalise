@@ -40,6 +40,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Boîte Gmail" FontSize="13" FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"
@@ -51,7 +52,12 @@
                         Visibility="Collapsed"
                         ToolTip="Installer la mise à jour disponible"
                         Click="UpdateButton_Click" />
-                <Button Grid.Column="2" Content="×" Style="{StaticResource IconButton}"
+                <Button Grid.Column="2" Content="⚙" Style="{StaticResource IconButton}"
+                        Width="24" Height="24" FontSize="15"
+                        Foreground="{StaticResource PrimaryText}"
+                        ToolTip="Gérer le widget"
+                        Click="ManageButton_Click" />
+                <Button Grid.Column="3" Content="×" Style="{StaticResource IconButton}"
                         Width="24" Height="24" FontSize="17"
                         Foreground="{StaticResource PrimaryText}" Click="HideButton_Click" />
             </Grid>
