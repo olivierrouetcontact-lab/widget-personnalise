@@ -43,6 +43,7 @@ public partial class MainWindow : Window
     private double _dragStartTop;
     private DateTimeOffset? _lastUpdateCheckUtc;
     private WidgetUpdate? _availableUpdate;
+    private WidgetManagerWindow? _managerWindow;
 
     public MainWindow()
     {
@@ -78,6 +79,7 @@ public partial class MainWindow : Window
 
         var menu = new System.Windows.Forms.ContextMenuStrip();
         menu.Items.Add("Ouvrir", null, (_, _) => Dispatcher.Invoke(ShowWidget));
+        menu.Items.Add("Gérer le widget", null, (_, _) => Dispatcher.BeginInvoke(new Action(ShowManager)));
         menu.Items.Add("Actualiser", null, (_, _) => Dispatcher.BeginInvoke(new Action(RefreshFromTray)));
         menu.Items.Add("Rechercher une mise à jour", null, (_, _) => Dispatcher.BeginInvoke(new Action(CheckForUpdateFromTray)));
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
@@ -141,8 +143,44 @@ public partial class MainWindow : Window
 
     private async void CheckForUpdateFromTray()
     {
+        _lastUpdateCheckUtc = null;
         await CheckForUpdateAsync(true);
     }
+
+    internal async Task<WidgetUpdate?> CheckForUpdateFromManagerAsync()
+    {
+        _lastUpdateCheckUtc = null;
+        await CheckForUpdateAsync(true);
+        return _availableUpdate;
+    }
+
+    internal async Task RefreshFromManagerAsync()
+    {
+        await RefreshAsync(false);
+    }
+
+    internal async Task RepairStartupFromManagerAsync()
+    {
+        StartupManager.SetEnabled(true);
+        _settings.StartWithWindows = true;
+        await _settingsStore.SaveAsync(_settings, _lifetime.Token);
+    }
+
+    internal void InstallAvailableUpdateFromManager()
+    {
+        StartAvailableUpdate();
+    }
+
+    internal void ShowWidgetFromManager()
+    {
+        ShowWidget();
+    }
+
+    internal string CurrentVersionText => UpdateService.CurrentVersion.ToString(3);
+
+    internal string InstallationDirectory => AppContext.BaseDirectory;
+
+    internal string SettingsDirectory => _settingsStore.DataDirectory;
 
     private async Task CheckForUpdateAsync(bool notify)
     {
@@ -477,6 +515,11 @@ public partial class MainWindow : Window
 
     private void UpdateButton_Click(object sender, RoutedEventArgs e)
     {
+        StartAvailableUpdate();
+    }
+
+    private void StartAvailableUpdate()
+    {
         if (_availableUpdate is null)
         {
             return;
@@ -603,6 +646,22 @@ public partial class MainWindow : Window
         Show();
         WindowState = WindowState.Normal;
         Activate();
+    }
+
+    private void ShowManager()
+    {
+        if (_managerWindow is not null)
+        {
+            _managerWindow.Show();
+            _managerWindow.Activate();
+            return;
+        }
+
+        var manager = new WidgetManagerWindow(this);
+        _managerWindow = manager;
+        manager.Closed += (_, _) => _managerWindow = null;
+        manager.Show();
+        manager.Activate();
     }
 
     private void RestoreOrPlaceWindow()
